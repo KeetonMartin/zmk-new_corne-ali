@@ -1,3 +1,4 @@
+// Include necessary behavior and keycode definitions
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
@@ -6,7 +7,9 @@
 #include <dt-bindings/zmk/rgb.h>
 
 / {
+    // Define custom behaviors that can be referenced in the keymap
     behaviors {
+        // Tap Dance behavior: When tapped, sends LEFT_SHIFT; when held, sends CAPS.
         td0: td0 {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
@@ -14,58 +17,118 @@
         };
     };
 
+    // Define a behavior for the RGB encoder (used to adjust brightness and speed)
     rgb_encoder: rgb_encoder {
         compatible = "zmk,behavior-sensor-rotate";
         #sensor-binding-cells = <0>;
         bindings = <&rgb_ug RGB_BRI>, <&rgb_ug RGB_BRD>;
     };
 
+    // The keymap node: contains all layers and sensor bindings for the keyboard
     keymap {
         compatible = "zmk,keymap";
 
+        // -----------------------
+        // Default (Base) Layer: QWERTY layout
+        // -----------------------
         default_layer {
             display-name = "QWERTY";
 
             bindings = <
-&kp TAB    &kp Q  &kp W      &kp E     &kp R  &kp T                              &kp UP                &kp Y        &kp U  &kp I      &kp O    &kp P     &kp BSPC
-&td0       &kp A  &kp S      &kp D     &kp F  &kp G                    &kp LEFT  &kp ENTER  &kp RIGHT  &kp H        &kp J  &kp K      &kp L    &kp SEMI  &kp SQT
-&kp LCTRL  &kp Z  &kp X      &kp C     &kp V  &kp B       &kp SPACE              &kp DOWN              &kp N        &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC
-                             &kp LGUI  &mo 1  &lt 3 SPACE                                              &lt 3 ENTER  &mo 2  &kp RALT
+                // First row: ESC, 1, 2, 3, 4, 5, TAB, Q, W, E, R, T, BSPC
+                &kp ESC    &kp N1    &kp N2    &kp N3    &kp N4    &kp N5      
+                          &kp TAB    &kp Q     &kp W     &kp E     &kp R     &kp T     &kp BSPC
+
+                // Second row: BSPC, A, S, D, F, G, QUOT, SEMI, L, K, J, H, RSFT
+                &kp BSPC   &kp A     &kp S     &kp D     &kp F     &kp G      
+                          &kp QUOT   &kp SEMI  &kp L     &kp K     &kp J     &kp H     &kp RSFT
+
+                // Third row: LSFT, LCTL, Z, X, C, V, B, SLSH, DOT, COMM, M, N, NO, NO
+                &kp LSFT   &kp LCTL  &kp Z     &kp X     &kp C     &kp V     &kp B
+                          &kp SLSH   &kp DOT   &kp COMM  &kp M     &kp N     &kp NO    &kp NO
+
+                // Bottom row: NO, NO, MO3, LT2 ENTER, LGUI, HOME, BSPC
+                             &kp NO   &kp NO   &mo 3     &lt 2 ENTER                                          &kp LGUI  &kp HOME  &kp BSPC
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOLUME_UP C_VOLUME_DOWN>;
         };
 
-        lower_layer {
-            display-name = "NUMBER";
+        // -----------------------
+        // Layer 1: Symbols and special characters (matching Iris layer 1)
+        // -----------------------
+        layer_1 {
+            display-name = "SYM";
             bindings = <
-&trans  &kp N1           &kp N2          &kp N3        &kp N4        &kp N5                                &trans            &kp N6           &kp N7           &kp N8           &kp N9           &kp N0    &kp BSPC
-&trans  &bt BT_CLR_ALL   &bt BT_SEL 0    &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3                  &trans  &mkp LCLK  &trans &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
-&trans  &rgb_ug RGB_OFF  &rgb_ug RGB_ON  &trans        &trans        &rgb_ug RGB_EFF &kp C_MUTE            &trans            &rgb_ug RGB_EFR  &rgb_ug RGB_SPI  &rgb_ug RGB_BRI  &rgb_ug RGB_BRD  &kp END   &kp PG_DN
-                                         &trans        &trans        &trans                                                  &kp INS          &kp DEL          &trans
-            >;
+                // First row: Transparent, EXCL, AT, HASH, DLLR, PRCNT, Transparent, CARET, AMPS, ASTRK, LPAR, RPAR, BSPC
+                &trans  &kp EXCL      &kp AT        &kp HASH   &kp DLLR   &kp PRCNT                       
+                          &trans            &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
 
-            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;
-        };
+                // Second row: Transparent, BT clear, Left Click (&mkp LCLK), Middle Click (&mkp MCLK), Right Click (&mkp RCLK),
+                // &mkp MB4, Transparent, Left Click, Transparent, MINUS, EQUAL, LBKT, RBKT, BSLH, GRAVE
+                &trans  &bt BT_CLR    &mkp LCLK     &mkp MCLK  &mkp RCLK  &mkp MB4                
+                          &trans  &mkp LCLK  &trans  &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH  &kp GRAVE
 
-        raise_layer {
-            display-name = "SYMBOL";
-            bindings = <
-&trans  &kp EXCL      &kp AT        &kp HASH   &kp DLLR   &kp PRCNT                       &trans            &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
-&trans  &bt BT_CLR    &mkp LCLK     &mkp MCLK  &mkp RCLK  &mkp MB4                &trans  &mkp LCLK  &trans &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH  &kp GRAVE
-&trans  &out OUT_USB  &out OUT_BLE  &none      &none      &mkp MB5  &kp C_MUTE            &trans            &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp TILDE
+                // Third row: Transparent, OUT_USB, OUT_BLE, none, none, &mkp MB5, C_MUTE, Transparent, UNDER, PLUS, LBRC, RBRC, PIPE, TILDE
+                &trans  &out OUT_USB  &out OUT_BLE  &none      &none      &mkp MB5  
+                          &kp C_MUTE            &trans            &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp TILDE
+
+                // Bottom row: Two Transparent entries, SPACE, then RET, Transparent, Transparent
                                     &trans     &trans     &kp SPACE                                         &kp RET    &trans     &trans
             >;
 
             sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;
         };
 
-        layer_3 {
-            display-name = "Fn";
+        // -----------------------
+        // Layer 2: Arrow keys and navigation (matching Iris layer 2)
+        // -----------------------
+        layer_2 {
+            display-name = "NAV";
             bindings = <
-&trans  &kp F1      &kp F2      &kp F3       &kp F4     &kp F5                         &trans            &kp F6       &kp F7     &kp F8       &kp F9      &kp F10          &kp F11
-&trans  &trans      &mkp LCLK   &mkp MCLK    &mkp RCLK  &mkp MB4               &trans  &mkp LCLK  &trans &bootloader  &mkp LCLK  &mkp MCLK    &mkp RCLK   &kp PRINTSCREEN  &kp F12
-&trans  &sys_reset  &trans      &bootloader  &trans     &mkp MB5 &kp C_MUTE            &trans            &trans       &trans     &bootloader  &sys_reset  &kp SCROLLLOCK   &kp PAUSE_BREAK
+                // First row: Transparent, F1, F2, F3, F4, F5, Transparent, F6, F7, F8, F9, F10, F11
+                &trans  &kp F1      &kp F2      &kp F3       &kp F4     &kp F5                         
+                          &trans            &kp F6       &kp F7     &kp F8       &kp F9      &kp F10          &kp F11
+
+                // Second row: Transparent, Transparent, Transparent, Transparent, Transparent, Transparent,
+                // Transparent, Transparent, Transparent, LEFT, DOWN, UP, RIGHT
+                &trans  &trans      &trans      &trans       &trans     &trans               
+                          &trans    &trans      &trans       &kp LEFT   &kp DOWN   &kp UP    &kp RIGHT
+
+                // Third row: Transparent, Transparent, Transparent, Transparent, Transparent, Transparent,
+                // Transparent, Transparent, Transparent, Transparent, Transparent, Transparent, Transparent
+                &trans  &trans      &trans      &trans       &trans     &trans
+                          &trans    &trans      &trans       &trans     &trans     &trans    &trans
+
+                // Bottom row: Three Transparent entries
+                                &trans      &trans      &trans                                           &trans       &trans     &trans
+            >;
+
+            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;
+        };
+
+        // -----------------------
+        // Layer 3: Function and RGB controls (matching Iris layer 3)
+        // -----------------------
+        layer_3 {
+            display-name = "FN";
+            bindings = <
+                // First row: Transparent, RGB_TOG, Transparent, Transparent, Transparent, Transparent,
+                // RGB_MOD, RGB_RMOD, Transparent, Transparent, Transparent, Transparent, Transparent
+                &trans  &rgb_ug RGB_TOG  &trans      &trans       &trans     &trans                         
+                          &rgb_ug RGB_MOD  &rgb_ug RGB_RMOD  &trans     &trans       &trans      &trans          &trans
+
+                // Second row: Transparent, RGB_HUI, RGB_HUD, Transparent, Transparent, Transparent,
+                // RGB_SAI, RGB_SAD, Transparent, Transparent, Transparent, Transparent, Transparent
+                &trans  &rgb_ug RGB_HUI  &rgb_ug RGB_HUD  &trans       &trans     &trans               
+                          &rgb_ug RGB_SAI  &rgb_ug RGB_SAD  &trans       &trans     &trans    &trans
+
+                // Third row: Transparent, Transparent, Transparent, Transparent, Transparent, Transparent,
+                // Transparent, Transparent, Transparent, Transparent, Transparent, Transparent, Transparent
+                &trans  &trans      &trans      &trans       &trans     &trans
+                          &trans    &trans      &trans       &trans     &trans     &trans    &trans
+
+                // Bottom row: Three Transparent entries
                                 &trans      &trans      &trans                                           &trans       &trans     &trans
             >;
 
